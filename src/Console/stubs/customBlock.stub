@@ -1,0 +1,21 @@
+<?php
+
+namespace {Namespace}\CustomPostTypes;
+
+use {Namespace}\WPBones\Foundation\WordPressCustomBlockServiceProvider as ServiceProvider;
+
+class {ClassName} extends ServiceProvider
+{
+
+  protected $id     = '{ID}';
+
+  /**
+   * You may override this method in order to register your own actions and filters.
+   *
+   */
+  public function boot()
+  {
+
+  }
+
+}

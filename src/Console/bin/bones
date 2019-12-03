@@ -241,6 +241,7 @@ class BonesCommandLine
         $this->line(" make:provider           Create a new service provider class");
         $this->line(" make:widget             Create a new Widget service provider class");
         $this->line(" make:model              Create a new database model class");
+        $this->line(" make:customBlock              Create a new block class");
 
         if ($this->kernel && $this->kernel->hasCommands()) {
             $this->info("Extensions");
@@ -748,6 +749,82 @@ class BonesCommandLine
         $this->info("Remember to add {$className} in the config/plugin.php array in the 'custom_post_types' key.");
     }
 
+    protected function createCustomBlock($className)
+    {
+        // help
+        if (empty($className) || $className == '--help') {
+            $this->info('Use php bones make:customBlock <ClassName>');
+
+            return;
+        }
+
+        $filename = sprintf('%s.php', $className);
+
+        // previous namespace
+        list($pluginName, $namespace) = explode(",", file_get_contents('namespace'));
+
+        $slug = str_replace("-", "_", $this->sanitize($className));
+
+        $id = $this->ask("Enter a ID:", $slug);
+        $name = $this->ask("Enter the name:");
+
+        if (empty($name)) {
+            $this->info('Please Enter A Name');
+            return;
+        }
+
+        if (empty($id)) {
+            $id = $slug;
+        }
+
+        // get the stub
+        $content = file_get_contents("vendor/wpbones/wpbones/src/Console/stubs/customBlock.stub");
+        $content = str_replace('{Namespace}', $namespace, $content);
+        $content = str_replace('{ClassName}', $className, $content);
+        $content = str_replace('{Name}', $name, $content);
+
+        $content = str_replace('{ID}', $id, $content);
+
+
+        // get the stub
+        $contentPackageJSON = file_get_contents("vendor/wpbones/wpbones/src/Console/stubs/customBlockPackageJSON.stub");
+        $contentPackageJSON = str_replace('{Namespace}', $namespace, $contentPackageJSON);
+        $contentPackageJSON = str_replace('{ClassName}', $className, $contentPackageJSON);
+        $contentPackageJSON = str_replace('{Name}', $name, $contentPackageJSON);
+        $contentPackageJSON = str_replace('{ID}', $id, $contentPackageJSON);
+
+        // get the stub
+        $contentIndexJS = file_get_contents("vendor/wpbones/wpbones/src/Console/stubs/customBlockIndexJS.stub");
+        $contentIndexJS = str_replace('{Namespace}', $namespace, $contentIndexJS);
+        $contentIndexJS = str_replace('{ClassName}', $className, $contentIndexJS);
+        $contentIndexJS = str_replace('{Name}', $name, $contentIndexJS);
+        $contentIndexJS = str_replace('{ID}', $id, $contentIndexJS);
+
+
+        if (!is_dir('plugin/CustomBlocks')) {
+            mkdir("plugin/CustomBlocks", 0777, true);
+        }
+
+        if (!is_dir('resources/blocks/' . $id)) {
+            mkdir('resources/blocks/' . $id, 0777, true);
+        }
+
+        if (!is_dir('resources/blocks/' . $id . '/src')) {
+            mkdir('resources/blocks/' . $id . '/src', 0777, true);
+        }
+
+        file_put_contents("plugin/CustomBlocks/{$filename}", $content);
+
+        file_put_contents("resources/blocks/${id}/package.json", $contentPackageJSON);
+        file_put_contents("resources/blocks/${id}/src/index.js", $contentIndexJS);
+
+        $this->line(" Created plugin/CustomBlocks/{$filename}");
+        $this->line(" Created resources/blocks/${id}/package.json");
+        $this->line(" Created resources/blocks/${id}/src/index.js");
+
+        $this->info("Remember to add {$className} in the config/plugin.php array in the 'custom_blocks' key.");
+    }
+
     protected function createCustomTaxonomyType($className)
     {
         // help
@@ -1110,6 +1187,9 @@ class BonesCommandLine
         } // make:cpy {className}
         elseif ($this->command('make:cpt')) {
             $this->createCustomPostType($this->arguments(1));
+        } // make:customBlock {className}
+        elseif ($this->command('make:customBlock')) {
+            $this->createCustomBlock($this->arguments(1));
         } // make:shortocde {className}
         elseif ($this->command('make:shortcode')) {
             $this->createShortcode($this->arguments(1));

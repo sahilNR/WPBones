@@ -472,6 +472,16 @@ class Plugin extends Container implements PluginContract
                 }
             }
 
+            // Custom post types Service Provider
+            if (isset($init['custom_blocks']) && !empty($init['custom_blocks'])) {
+                foreach ($init['custom_blocks'] as $className) {
+                    $object = new $className($this);
+                    $object->register();
+                    $this->provides[$className] = $object;
+                }
+            }
+
+
             // Custom taxonomy type Service Provider
             if (isset($init['custom_taxonomy_types']) && !empty($init['custom_taxonomy_types'])) {
                 foreach ($init['custom_taxonomy_types'] as $className) {

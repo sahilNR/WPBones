@@ -2,8 +2,8 @@
 
 namespace WPKirk\WPBones\Foundation;
 
-use WPKirk\WPBones\Support\ServiceProvider;
 use WPKirk\WPBones\Foundation\Http\Request;
+use WPKirk\WPBones\Support\ServiceProvider;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
